@@ -12,6 +12,8 @@ scipionHome = dirname(abspath(__file__))
 os.environ["SCIPION_TESTS_CMD"] = basename(__file__) + " tests"
 os.environ["LD_LIBRARY_PATH"] = ":".join([os.environ.get("LD_LIBRARY_PATH", ""), join(scipionHome, "software", "lib")])
 os.environ["PYTHONPATH"] = ":".join([os.environ.get("PYTHONPATH", ""), join(scipionHome, "software", "bindings")])
+os.environ["PYTHONUSERBASE"] = join(scipionHome, "software", "python-packages")
+
 
 cmd = ""
 

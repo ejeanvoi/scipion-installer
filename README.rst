@@ -51,23 +51,16 @@ Advanced options
                    anyway if found in the path, else: virtualenv.
       -venv        Force virtualenv as environment manager, otherwise will use
                    conda if found in the path, otherwise: virtualenv.
-      -dev         installs components in devel mode
-      -noXmipp     Xmipp is installed in devel mode under xmipp-bundle dir by
-                   default. This flag skips the Xmipp installation.
-      -j J         Number of processors, Xmipp may take a while...
       -dry         Just shows the commands without running them.
-      -httpsClone  Only when -dev is active, makes git clones using https instead
-                   of ssh
       -noAsk       try to install scipion ignoring some control questions in that
                    process. You must make sure to write the correct path where
                    Scipion will be installed
       -n N         Name of the virtual environment. By default, if this parameter
                    is not passed, the name will be .scipion3env
-      -sciBranch SCIBRANCH  Name of the branch of scipion repos to clone when -dev
-                   is passed.
-      -xmippBranch XMIPPBRANCH
-                   Name of the branch of xmipp repos to clone when -dev
-                   is passed.
+
+      -scratchPath SCRATCHPATH
+                        Path to a folder working at high speed(like SSDs) to be used temporarily during processing.
+
 
 
 
