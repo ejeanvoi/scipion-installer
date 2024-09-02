@@ -12,16 +12,23 @@ scipionHome = dirname(abspath(__file__))
 os.environ["SCIPION_TESTS_CMD"] = basename(__file__) + " tests"
 os.environ["LD_LIBRARY_PATH"] = ":".join([os.environ.get("LD_LIBRARY_PATH", ""), join(scipionHome, "software", "lib")])
 os.environ["PYTHONPATH"] = ":".join([os.environ.get("PYTHONPATH", ""), join(scipionHome, "software", "bindings")])
+os.environ["PYTHONUSERBASE"] = join(scipionHome, "software", "python-packages")
+
 
 cmd = ""
-if len(sys.argv) > 1 and sys.argv[1] == 'git':
+
+noArgs = len(sys.argv)==1
+
+if not noArgs and sys.argv[1] == 'git':
     for repo in ['scipion-app', 'scipion-pyworkflow', 'scipion-em']:
         cmd += ("(cd "+join(scipionHome, repo)+" ; echo ' > in "+repo+":' ;"
                 " git "+' '.join(sys.argv[2:])+" ; echo) ; ")
 else:
     # Activate the environment
     cmd = '%(ACTIVATE_ENV_CMD)s && '
-    cmd += "python -m scipion %%s" %% " ".join(sys.argv[1:])
+    cmd += "python -m scipion"
+    cmd += '' if noArgs else ' "%%s"' %% '" "'.join(sys.argv[1:])
+
 
 # Set SCIPION_HOME
 os.environ["SCIPION_HOME"] = scipionHome
