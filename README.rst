@@ -38,28 +38,27 @@ Advanced options
 
 .. code-block::
 
-    usage: scipioninstaller [-h] [-conda] [-venv] [-dev] [-noXmipp] [-j J] [-dry]
-                          [-httpsClone] [-noAsk] [-n N]
-                          path
+   usage: installscipion [-h] [-conda] [-venv] [-dry] [-noAsk] [-n N] [-scratchPath SCRATCHPATH] [-python PYTHON] path
+
+        Installs scipion3 in a conda or virtualenv environment. Check all parameters bellow for a custom installation. If there are issues initializing conda you
+        can set CONDA_ACTIVATION_CMD variable and it will be used instead of guessing. Typical values are . "/path/to/miniconda3/etc/profile.d/conda.sh" or eval
+        "$(/path/to/miniconda3/bin/conda shell.bash hook)"
 
     positional arguments:
-      path         Location where you want scipion to be installed.
+      path                  Location where you want scipion to be installed.
 
-    optional arguments:
-      -h, --help   show this help message and exit
-      -conda       Force conda as environment manager, otherwise will use conda
-                   anyway if found in the path, else: virtualenv.
-      -venv        Force virtualenv as environment manager, otherwise will use
-                   conda if found in the path, otherwise: virtualenv.
-      -dry         Just shows the commands without running them.
-      -noAsk       try to install scipion ignoring some control questions in that
-                   process. You must make sure to write the correct path where
-                   Scipion will be installed
-      -n N         Name of the virtual environment. By default, if this parameter
-                   is not passed, the name will be .scipion3env
-
+    options:
+      -h, --help            show this help message and exit
+      -conda                Force conda as environment manager, otherwise will use conda anyway if found in the path, else: virtualenv.
+      -venv                 Force virtualenv as environment manager, otherwise will use conda if found in the path, otherwise: virtualenv.
+      -dry                  Just shows the commands without running them.
+      -noAsk                try to install scipion ignoring some control questions in that process. You must make sure to write the correct path where Scipion
+                            will be installed
+      -n N                  Name of the virtual environment. By default, if this parameter is not passed, the name will be scipion3
       -scratchPath SCRATCHPATH
-                        Path to a folder working at high speed(like SSDs) to be used temporarily during processing.
+                            Path to a folder working at high speed(like SSDs) to be used temporarily during processing.
+      -python PYTHON        Python version to use in the environment. For virtualenv, default value will become "python3", otherwise argument will be
+                            literally passed to virtualenv.Default value is 3.8 but up to 3.11 may work as well.
 
 
 

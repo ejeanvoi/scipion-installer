@@ -1,2 +1,2 @@
 INSTALL_ENTRY = 'installscipion'
-__version__ = '2.0'
+__version__ = '2.1'
