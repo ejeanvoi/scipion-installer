@@ -39,12 +39,12 @@ def ask_for_input(message, no_ask):
         return YES
 
 
-def get_environment_creation_cmd(conda, scipion_home, scipion_env, no_ask, python_version):
+def get_environment_creation_cmd(conda, scipion_home, scipion_env, no_ask, python_version, conda_path):
 
     cmd = cmdfy("cd %s" % scipion_home)
 
     if conda:
-        cmd += get_conda_creation_cmd(scipion_env, no_ask, python_version)
+        cmd += get_conda_creation_cmd(scipion_env, no_ask, python_version, conda_path)
     else:
         cmd += get_virtualenv_creation_cmd(scipion_home, scipion_env, python_version)
 
@@ -55,13 +55,16 @@ class InstallationError(Exception):
     pass
 
 
-def get_conda_creation_cmd(scipion_env, no_ask, python_version):
+def get_conda_creation_cmd(scipion_env, no_ask, python_version, conda_path):
 
     cmd = cmdfy(get_conda_init_cmd())
 
     silent_mode = "-y" if no_ask else ""
-    cmd += cmdfy("%s create %s -n %s python=%s" % (CONDA, silent_mode, scipion_env, python_version))
-    cmd += cmdfy(get_conda_env_activation_cmd(scipion_env))
+    if conda_path:
+        cmd += cmdfy("%s create %s --prefix %s python=%s" % (CONDA, silent_mode, conda_path, python_version))
+    else:
+        cmd += cmdfy("%s create %s -n %s python=%s" % (CONDA, silent_mode, scipion_env, python_version))
+    cmd += cmdfy(get_conda_env_activation_cmd(scipion_env, conda_path))
 
     return cmd
 
@@ -89,9 +92,12 @@ def guess_conda_init_cmd(do_raise=True):
         return 'eval "$(%s shell.%s hook)"' % (conda_path, shell)
 
 
-def get_conda_env_activation_cmd(scipion_env):
+def get_conda_env_activation_cmd(scipion_env, conda_path):
 
-    return "conda activate %s" % scipion_env
+    if conda_path:
+        return "conda activate %s" % conda_path
+    else:
+        return "conda activate %s" % scipion_env
 
 
 def cmdfy(cmd, sep=CMD_SEP):
@@ -167,7 +173,7 @@ def get_scipion_installation_cmd(scipion_home):
     return cmd
 
 
-def create_launcher(scipion_home, conda, dry, scipion_env):
+def create_launcher(scipion_home, conda, dry, scipion_env, conda_path):
 
     content = LAUNCHER_TEMPLATE
     python_program = os.path.basename(sys.executable)
@@ -176,7 +182,7 @@ def create_launcher(scipion_home, conda, dry, scipion_env):
 
     if conda:
         replace_dict = {VIRTUAL_ENV_VAR: "CONDA_DEFAULT_ENV",
-                        ACTIVATE_ENV_CMD: conda_init + " && " + get_conda_env_activation_cmd(scipion_env),
+                        ACTIVATE_ENV_CMD: conda_init + " && " + get_conda_env_activation_cmd(scipion_env, conda_path),
                         PYTHON_PROGRAM: str(python_program)}
     else:
         replace_dict = {VIRTUAL_ENV_VAR: "VIRTUAL_ENV",
@@ -243,6 +249,9 @@ def main():
                             help='Force conda as environment manager, otherwise will use conda anyway if '
                                  'found in the path, else: virtualenv.',
                             action='store_true')
+        parser.add_argument('-condaPath',
+                            help='Use a path instead of a named Conda environment',
+                            default=None)
         parser.add_argument(VENV_ARG,
                             help='Force virtualenv as environment manager, otherwise will use conda if '
                                  'found in the path, otherwise: virtualenv.',
@@ -262,7 +271,7 @@ def main():
                                        'not passed, the name will be '
                                        + SCIPION_ENV,
                             default=SCIPION_ENV)
-
+        parser.add_argument('-p', help='Path to the Conda environment')
         parser.add_argument('-scratchPath',
                             help='Path to a folder working at high '
                                  'speed(like SSDs) to be used temporarily '
@@ -298,7 +307,7 @@ def main():
         dry = args.dry
         scratch_path = args.scratchPath
         python = args.python
-
+        conda_path = args.condaPath
         # Creating the Scratch Folder
         if scratch_path is not None:
             solve_folder(scratch_path, dry)
@@ -309,13 +318,13 @@ def main():
         if not conda and scipion_env == SCIPION_ENV:
             scipion_env = '.' + scipion_env
 
-        cmd = get_environment_creation_cmd(conda, scipion_home, scipion_env, no_ask, python)
+        cmd = get_environment_creation_cmd(conda, scipion_home, scipion_env, no_ask, python, conda_path)
         # Creating Scipion installation command and the launcher
         cmd += get_scipion_installation_cmd(scipion_home)
         # Flush stdout
         sys.stdout.flush()
         run_cmd(cmd, dry)
-        launcher = create_launcher(scipion_home, conda, dry, scipion_env)
+        launcher = create_launcher(scipion_home, conda, dry, scipion_env, conda_path)
         print("------------------------------------")
         print("Scipion core successfully installed.")
         print("------------------------------------")
